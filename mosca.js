@@ -33,7 +33,7 @@ function MoscaInNode(n) {
     //TODO: read https://github.com/mcollina/mosca/blob/master/lib/server.js and add support of mqtts and wss
 
     var node = this;
-    node.log("Binding mosca mqtt server on port: " + this.port);
+    node.log("Binding mosca mqtt server on port: " + this.mqtt_port);
     var server = new mosca.Server(moscaSettings, function (err) {
         if (err) {
             err.msg = 'Error binding mosca mqtt server, cause: ' + err.toString();
@@ -93,6 +93,12 @@ function MoscaInNode(n) {
     this.on('close', function () {
         node.log("Unbinding mosca mqtt server from port: " + this.port);
         server.close();
+        server.removeAllListeners('clientConnected');
+        server.removeAllListeners('clientDisconnected');
+        server.removeAllListeners('published');
+        server.removeAllListeners('subscribed');
+        server.removeAllListeners('unsubscribed');
+        
     });
     if (this.dburl) {
         var onPersistenceReady = function () {
