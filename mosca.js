@@ -38,7 +38,15 @@ function MoscaInNode(n) {
   var server = new mosca.Server(moscaSettings, function(err) {
     if (err) {
       err.msg = 'Error binding mosca mqtt server, cause: ' + err.toString();
-      node.error(err);
+      node.error(err.msg);
+      if (err.toString().indexOf("EADDRINUSE")) {
+      	if (err.details && err.details.port)
+      		node.status({fill: "red", shape: "dot", text: "port " + err.details.port + " in use"});
+      	else
+      		node.status({fill: "red", shape: "dot", text: "port in use"});
+      }
+    } else {
+    	node.status({fill: "green", shape: "dot", text: "ok"});
     }
   });
 
